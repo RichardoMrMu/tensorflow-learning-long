@@ -5,29 +5,45 @@
 # @Software: PyCharm
 
 import  tensorflow as tf
+<<<<<<< HEAD
 # try:
 #     import tensorflow.python.keras as keras
 # except:
 #     import tensorflow.keras as keras
 import tensorflow.keras as keras
+=======
+try:
+    import tensorflow.python.keras as keras
+
+except:
+    import tensorflow.keras as keras
+>>>>>>> origin/master
 from keras import optimizers,layers,Model,datasets,Sequential,metrics
 def preprocess(x,y):
     # [0,255] -> [-1,1]
     x = 2*tf.cast(x,dtype=tf.float32)/255.-1
     y = tf.cast(y,dtype=tf.int32)
     return x,y
+<<<<<<< HEAD
 batch_size = 32
+=======
+
+>>>>>>> origin/master
 (x,y),(x_test,y_test) = datasets.cifar10.load_data()
 x_train,x_val = tf.split(x,num_or_size_splits=[50000,10000])
 y_train,y_val = tf.split(y,num_or_size_splits=[50000,10000])
 y_train,y_val,y_test = tf.squeeze(y_train),tf.squeeze(y_val),tf.squeeze(y_test)
 # y_test = tf.squeeze(y_test)
+<<<<<<< HEAD
 train_db = tf.data.Dataset.from_tensor_slices((x_train,y_train))
 train_db = train_db.map(preprocess).shuffle(50000).batch(batch_size)
 val_db = tf.data.Dataset.from_tensor_slices((x_val,y_val))
 val_db  = val_db.map(preprocess).shuffle(10000).batch(batch_size)
 test_db = tf.data.Dataset.from_tensor_slices((x_test,y_test))
 test_db = test_db.map(preprocess).batch(batch_size)
+=======
+train_db = tf.data.Dataset.
+>>>>>>> origin/master
 
 
 class MyDense(keras.layer.Layer):
@@ -36,7 +52,11 @@ class MyDense(keras.layer.Layer):
         self.kernel = self.add_variable('w',[input_dim,output_dim])
 
     def call(self,inputs,training=None):
+<<<<<<< HEAD
         x = inputs @ self.kernel
+=======
+        x = input @ self.kernel
+>>>>>>> origin/master
         return x
 class MyModel(Model):
     def __init__(self):
@@ -64,6 +84,7 @@ class MyModel(Model):
         return output
 model = MyModel()
 optimizer = optimizers.Adam(lr=1e-3)
+<<<<<<< HEAD
 def main():
     model.compile(optimizer=optimizer,loss=tf.losses.categorical_crossentropy(from_logits=True),
                   metrics=['accuracy'])
@@ -82,3 +103,9 @@ def main():
 
 if __name__ == '__main__':
     main()
+=======
+
+model.compile(optimizer=optimizer,loss=tf.losses.categorical_crossentropy(from_logits=True),
+              metrics=['accuracy'])
+mdoel.
+>>>>>>> origin/master
