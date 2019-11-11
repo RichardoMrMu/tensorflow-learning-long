@@ -9,7 +9,7 @@ try:
     import tensorflow.python,keras as keras
 except:
     import tensorflow.keras as keras
-from keras import layers,optimizers,datasets,Sequential
+from tensorflow.keras import layers,optimizers,datasets,Sequential
 import os
 import numpy as np
 tf.random.set_seed(22)
@@ -78,8 +78,53 @@ class VAE(keras.Model):
         return z
     def call(self, inputs, training=None):
         # [b,784] => [b,z_dim] [b,z_dim]
-        mu
+        mu,log_var = self.encoder(inputs)
+        # reparameterize trick
+        z = self.reparameterize(mu,log_var)
+        x_hat = self.decoder(z)
+        return x_hat ,mu , log_var
 
+model = VAE()
+model.build(input_shape=(4,784))
+optimizer = tf.optimizers.Adam(lr=1e-3)
+def main():
+    for epoch in range(100):
+        for step ,x in enumerate(train_db):
+            x= tf.reshape(x,[-1,784])
+            with tf.GradientTape() as tape:
+                x_rec_logits,mu,log_var = model(x)
+                rec_loss = tf.nn.sigmoid_cross_entropy_with_logits(labels=x)
+                rec_loss = tf.reduce_sum(rec_loss) / x.shape[0]
+
+                k1_div = -0.5*(log_var+1 -mu**2 - tf.exp(log_var))
+                k1_div = tf.reduce_sum(k1_div) / x.shape[0]
+
+                loss = rec_loss + 1.* k1_div
+
+            grad = tape.gradient(loss,model.trainable_variables)
+            optimizer.apply_gradient(loss,model.trainable_variabel)
+
+            if step% 100 == 0:
+                print("epoch:{0},step:{1},k1_div:{2},rec_loss:{3}".format(
+                    epoch,step,float(k1_div),float(loss)
+                ))
+        # evaluation
+        z = tf.random.normal((batchsz,z_dim))
+        logits = model.decoder(z)
+        x_hat = tf.sigmoid(logits)
+        x_hat = tf.reshape(x_hat,[-1,28,28]).numpy()*255.
+        x_hat = x_hat.dtype(np.unit8)
+        save_images(x_hat,"vae_images/sampled_epoch%d.png"%epoch)
+
+        x = next(iter(test_db))
+        x = tf.shape(x,[-1,784])
+        x_hat_logits ,_,_ = model(x)
+        x_hat = tf.sigmoid(x_hat_logits)
+        x_hat = tf.reshape(x_hat,[-128,28]).numpy()*255.
+        x_hat = x_hat.dtype(np.unit8)
+        save_images(x_hat,"vae_images/rec_epoch%d.png"%epoch)
+if __name__ == '__main__':
+    main()
 
 
 
