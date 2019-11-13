@@ -15,15 +15,16 @@ import os
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = '2'
 batch_size = 128
-# the most frequest words
+# the most frequest words 只对常见的单词进行编码
 total_words = 10000
-max_review_len = 100
-embedding_len = 10
+max_review_len = 80
+embedding_len = 100
 (x_train,y_train) , (x_test,y_test) = datasets.imdb.load_data(num_words=total_words)
 # x_train [b,80]
 # x_test [b,80]
-x_train = keras.preprocessing.sequence.pad_sequence(x_train,maxlen=max_review_len)
-x_test = keras.preprocessing.sequence.pad_sequence(x_test,maxlen=max_review_len)
+# max_review_len是控制句子的长度 pad_sequence是控制句子的长度，长就去掉，短就补零
+x_train = keras.preprocessing.sequence.pad_sequences(x_train,maxlen=max_review_len)
+x_test = keras.preprocessing.sequence.pad_sequences(x_test,maxlen=max_review_len)
 
 train_db = tf.data.Dataset.from_tensor_slices((x_train,y_train))
 train_db = train_db.shuffle(1000).batch(batch_size=batch_size,drop_remainder=True)
